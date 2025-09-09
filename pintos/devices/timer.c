@@ -49,8 +49,8 @@ static bool wake_less(const struct list_elem *a,
 					  const struct list_elem *b,
 					  void *aux UNUSED)
 {
-	const struct thread *ta = list_entry(a, struct thread, elem);
-	const struct thread *tb = list_entry(b, struct thread, elem);
+	const struct thread *ta = list_entry(a, struct thread, sleep_elem);
+	const struct thread *tb = list_entry(b, struct thread, sleep_elem);
 	return ta->wake_tick < tb->wake_tick;
 }
 
@@ -146,11 +146,11 @@ static void timer_interrupt(struct intr_frame *args UNUSED)
 	ticks++;
 	thread_tick();
 
-	int64_t now = ticks; // ← 이 값을 쓰자
+	int64_t now = ticks;
 
 	while (!list_empty(&sleep_list))
 	{
-		struct thread *t = list_entry(list_front(&sleep_list), struct thread, elem);
+		struct thread *t = list_entry(list_front(&sleep_list), struct thread, sleep_elem);
 		if (t->wake_tick <= now)
 		{
 			list_pop_front(&sleep_list);
